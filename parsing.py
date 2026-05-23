@@ -5,27 +5,45 @@ from typing import List
 
 
 def parsing_file(file_path: str) -> Graph:
-    nb_drones: int = 0
-    zones: List[Zone] = []
-    connections: List[Connection] = []
-    lines: List[str] = []
+    try:
+        nb_drones: int = 0
+        nb_drones_parsed = False
+        zones: List[Zone] = []
+        connections: List[Connection] = []
+        lines: List[str] = []
 
-    with open(file_path, 'r') as f:
-        lines = f.readlines()
-    for l in lines:
-        l = l.strip()
-        if l.startswith("#") or len(l) == 0:
-            continue
-        elif l.startswith("start_hub"):
-            ...
-        elif l.startswith("end_hub"):
-            ...
-        elif l.startswith("hub"):
-            ...
-        elif l.startswith("connection"):
-            ...
-        else:
-            ...
-        
-
-    return Graph(nb_drones, zones, connections)
+        with open(file_path, 'r') as f:
+            lines = f.readlines()
+        for line in lines:
+            line = line.strip()
+            if line.startswith("#") or len(line) == 0:
+                continue
+            if line.startswith("nb_drones"):
+                if ": " in line:
+                    s = line.split(": ")
+                else:
+                    s = line.split(":")
+                nb_drones = int(s[1])
+                if nb_drones <= 0:
+                    nb_drones_parsed = False
+                    print("The First Line Should Be nb_drones")
+                    exit()
+                else:
+                    nb_drones_parsed = True
+            elif not nb_drones_parsed:
+                print("The First Line Should Be nb_drones")
+                exit()
+            elif line.startswith("start_hub"):
+                ...
+            elif line.startswith("end_hub"):
+                ...
+            elif line.startswith("hub"):
+                ...
+            elif line.startswith("connection"):
+                ...
+            else:
+                ...
+        return Graph(nb_drones, zones, connections)
+    except Exception as e:
+        print("[ERROR]:", e)
+        exit()
