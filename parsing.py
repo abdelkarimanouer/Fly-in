@@ -7,7 +7,7 @@ from typing import List
 def parsing_file(file_path: str) -> Graph:
     try:
         nb_drones: int = 0
-        nb_drones_parsed = False
+        nb_drones_parsed: bool = False
         zones: List[Zone] = []
         connections: List[Connection] = []
         lines: List[str] = []
