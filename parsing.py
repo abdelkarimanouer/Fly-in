@@ -27,7 +27,7 @@ def parsing_file(file_path: str) -> Graph:
 
         with open(file_path, 'r') as f:
             lines = f.readlines()
-        for line in lines:
+        for i, line in enumerate(lines, 1):
             line = line.strip()
             if line.startswith("#") or len(line) == 0:
                 continue
@@ -40,15 +40,15 @@ def parsing_file(file_path: str) -> Graph:
                 print("[ERROR]: nb_drones must be the first line")
                 exit()
             elif line.startswith("start_hub"):
-                ...
+                line = line.replace(":", "")
             elif line.startswith("end_hub"):
-                ...
+                line = line.replace(":", "")
             elif line.startswith("hub"):
-                ...
+                line = line.replace(":", "")
             elif line.startswith("connection"):
-                ...
+                line = line.replace(":", "")
             else:
-                ...
+                print(f"[ERROR] line <{i}>: invalid syntax")
         return Graph(nb_drones, zones, connections)
     except Exception as e:
         print("[ERROR]:", e)
