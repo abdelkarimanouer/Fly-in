@@ -4,10 +4,23 @@ from zone import Zone
 from typing import List
 
 
+def get_nb_drones(line: str) -> int:
+    nb_drones: int = 0
+
+    if ": " in line:
+        s = line.split(": ")
+    else:
+        s = line.split(":")
+    nb_drones = int(s[1])
+    if nb_drones <= 0:
+        return -1
+    else:
+        return nb_drones
+
+
 def parsing_file(file_path: str) -> Graph:
     try:
-        nb_drones: int = 0
-        nb_drones_parsed: bool = False
+        nb_drones: int = -1
         zones: List[Zone] = []
         connections: List[Connection] = []
         lines: List[str] = []
@@ -19,19 +32,12 @@ def parsing_file(file_path: str) -> Graph:
             if line.startswith("#") or len(line) == 0:
                 continue
             if line.startswith("nb_drones"):
-                if ": " in line:
-                    s = line.split(": ")
-                else:
-                    s = line.split(":")
-                nb_drones = int(s[1])
-                if nb_drones <= 0:
-                    nb_drones_parsed = False
-                    print("The First Line Should Be nb_drones")
+                nb_drones = get_nb_drones(line)
+                if nb_drones == -1:
+                    print("[ERROR]: nb_drones must be positive")
                     exit()
-                else:
-                    nb_drones_parsed = True
-            elif not nb_drones_parsed:
-                print("The First Line Should Be nb_drones")
+            elif nb_drones == -1:
+                print("[ERROR]: nb_drones must be the first line")
                 exit()
             elif line.startswith("start_hub"):
                 ...
