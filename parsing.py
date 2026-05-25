@@ -88,6 +88,7 @@ def parsing_file(file_path: str) -> Graph:
         connections: List[Connection] = []
         lines: List[str] = []
         start_hub_found: bool = False
+        end_hub_found: bool = False
 
         with open(file_path, 'r') as f:
             lines = f.readlines()
@@ -107,9 +108,10 @@ def parsing_file(file_path: str) -> Graph:
                 parse_hub(line, zones, "start_hub", start_hub_found, i)
                 start_hub_found = True
             elif line.startswith("end_hub"):
-                ...
+                parse_hub(line, zones, "end_hub", end_hub_found, i)
+                end_hub_found = True
             elif line.startswith("hub"):
-                ...
+                parse_hub(line, zones, "hub", False, i)
             elif line.startswith("connection"):
                 ...
             else:
