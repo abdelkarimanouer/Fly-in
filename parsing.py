@@ -4,9 +4,12 @@ from zone import Zone
 from typing import List, Dict
 
 
-def get_nb_drones(line: str) -> int:
+def get_nb_drones(line: str, nb_drones_found: bool) -> int:
     nb_drones: int = 0
 
+    if nb_drones_found:
+        print("[ERROR]: nb_drones should not be duplicated")
+        exit()
     if ": " in line:
         s = line.split(": ")
     else:
@@ -78,6 +81,11 @@ def parse_hub(line: str, zones: List[Zone], hub_category: str,
     metadata: dict = parse_metadata_zones(data[4:], line_num)
     zone = Zone(hub_category, name, (x, y), metadata['color'],
                 metadata['zone_type'], metadata['max_drones'])
+
+    for z in zones:
+        if (z.name == zone.name) or (z.coordinate == zone.coordinate):
+            print("[ERROR]: Every Zone should has unique name | coordinate")
+            exit()
     zones.append(zone)
 
 
@@ -87,6 +95,7 @@ def parsing_file(file_path: str) -> Graph:
         zones: List[Zone] = []
         connections: List[Connection] = []
         lines: List[str] = []
+        nb_drones_found = False
         start_hub_found: bool = False
         end_hub_found: bool = False
 
@@ -97,10 +106,11 @@ def parsing_file(file_path: str) -> Graph:
             if line.startswith("#") or len(line) == 0:
                 continue
             if line.startswith("nb_drones"):
-                nb_drones = get_nb_drones(line)
+                nb_drones = get_nb_drones(line, nb_drones_found)
                 if nb_drones == -1:
                     print("[ERROR]: nb_drones must be positive")
                     exit()
+                nb_drones_found = True
             elif nb_drones == -1:
                 print("[ERROR]: nb_drones must be the first line")
                 exit()
