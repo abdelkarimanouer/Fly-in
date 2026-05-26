@@ -19,7 +19,7 @@ def get_nb_drones(line: str) -> int:
         return nb_drones
 
 
-def parse_metadata_zones(meta_data: str, line_num: int) -> Dict:
+def parse_metadata_zones(meta_data: List[str], line_num: int) -> Dict:
     default_data = {'color': None, 'zone_type': "normal",
                     'max_drones': 1
                     }
@@ -80,7 +80,7 @@ def parse_hub(line: str, zones: List[Zone], hub_category: str,
     except Exception:
         print("[ERROR]: coordinates must be integers")
         exit()
-    metadata: dict = parse_metadata_zones(data[4:], line_num)
+    metadata: Dict = parse_metadata_zones(data[4:], line_num)
     zone = Zone(hub_category, name, (x, y), metadata['color'],
                 metadata['zone_type'], metadata['max_drones'])
 
