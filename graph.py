@@ -16,6 +16,15 @@ class Graph:
                 return z
         raise ValueError(f"Zone '{name}' not found")
 
+    def get_zone_cost(self, zone: Zone) -> int:
+        costs = {
+            "normal": 1,
+            "blocked": -1,
+            "restricted": 2,
+            "priority": 1
+        }
+        return costs.get(zone.zone_type, 1)
+
     def get_neighbor_zone(self, name_zone: str) -> List[Zone]:
         try:
             neighbors: List[Zone] = []
