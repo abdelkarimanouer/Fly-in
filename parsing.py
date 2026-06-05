@@ -12,7 +12,11 @@ def get_nb_drones(line: str) -> int:
         s = line.split(": ")
     else:
         s = line.split(":")
-    nb_drones = int(s[1])
+    try:
+        nb_drones = int(s[1])
+    except Exception:
+        print("[ERROR]: Invalid nb_drones (nb_drones: <number>)")
+        exit()
     if nb_drones <= 0:
         return -1
     else:
