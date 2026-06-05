@@ -9,3 +9,24 @@ class Graph:
         self.nb_drones: int = nb_drones
         self.zones: List[Zone] = zones
         self.connections: List[Connection] = connections
+
+    def get_zone_from_zones_list(self, name: str) -> Zone:
+        for z in self.zones:
+            if z.name == name:
+                return z
+        raise ValueError(f"Zone '{name}' not found")
+
+    def get_neighbor_zone(self, name_zone: str) -> List[Zone]:
+        try:
+            neighbors: List[Zone] = []
+
+            for c in self.connections:
+                if name_zone == c.name1:
+                    z = self.get_zone_from_zones_list(c.name2)
+                    neighbors.append(z)
+                if name_zone == c.name2:
+                    z = self.get_zone_from_zones_list(c.name1)
+                    neighbors.append(z)
+            return neighbors
+        except Exception as e:
+            raise ValueError(str(e))
