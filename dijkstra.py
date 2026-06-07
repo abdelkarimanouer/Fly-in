@@ -5,7 +5,7 @@ import heapq as h
 import math
 
 
-def dijkstra(graph: Graph, start: Zone, end: Zone) -> List[Zone]:
+def shortest_path(graph: Graph, start: Zone, end: Zone) -> List[Zone]:
     path: List = []
     heap: List = []
     visited = set()
