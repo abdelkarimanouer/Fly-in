@@ -11,3 +11,4 @@ class Zone:
         self.color: str | None = color
         self.zone_type: str = zone_type
         self.max_drones: int = max_drones
+        self.current_drones: int = 0
