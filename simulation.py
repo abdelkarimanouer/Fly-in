@@ -12,7 +12,7 @@ def assign_paths(graph: Graph, start: Zone, end: Zone, nb_drones: int):
 
     while remaining > 0:
         path: List[Zone] = shortest_path(graph, start, end)
-        min_capacity = min(z.max_drones for z in path)
+        min_capacity = min(z.max_drones - z.current_drones for z in path)
         drones_for_path = min(remaining, min_capacity)
 
         for i in range(drones_for_path):
@@ -21,7 +21,9 @@ def assign_paths(graph: Graph, start: Zone, end: Zone, nb_drones: int):
             drone_id += 1
 
         for zone in path:
-            zone.current_drones += drones_for_path
+            if (zone.hub_category != "start_hub"
+                    and zone.hub_category != "end_hub"):
+                zone.current_drones += drones_for_path
 
         remaining -= drones_for_path
 

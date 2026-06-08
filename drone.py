@@ -7,5 +7,5 @@ class Drone:
         self.id: int = id
         self.current_zone: Zone = current_zone
         self.path: List[Zone] = path
-        self.drn_pos_path: int = 1
+        self.d_pos_path: int = 1
         self.is_done: bool = False

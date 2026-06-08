@@ -1,7 +1,7 @@
 install:
 
 run:
-	@python3 main.py
+	@python3 main.py maps/easy/01_linear_path.txt
 
 debug:
 	@python3 -m pdb main.py
