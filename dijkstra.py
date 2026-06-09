@@ -36,12 +36,6 @@ def shortest_path(graph: Graph, start: Zone, end: Zone) -> List[Zone]:
         for n in graph.get_neighbor_zone(name_zone):
             if n.zone_type == "blocked":
                 continue
-            if n.current_drones >= n.max_drones:
-                if (
-                    n.hub_category != "start_hub" and
-                    n.hub_category != "end_hub"
-                        ):
-                    continue
             if n.name not in visited:
                 new_cost = current_cost + graph.get_zone_cost(n)
                 if new_cost < costs[n.name]:
