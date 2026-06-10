@@ -33,7 +33,7 @@ def shortest_path(graph: Graph, start: Zone, end: Zone) -> List[Zone]:
             path.reverse()
             return path
 
-        for n in graph.get_neighbor_zone(name_zone):
+        for n in graph.adjacency[graph.get_zone_from_zones_list(name_zone)]:
             if n.zone_type == "blocked":
                 continue
             if n.name not in visited:
@@ -43,5 +43,4 @@ def shortest_path(graph: Graph, start: Zone, end: Zone) -> List[Zone]:
                     parents[n.name] = name_zone
                     h.heappush(heap, (new_cost, n.name))
 
-    print("[ERROR]: No path found from start to end")
-    exit()
+    raise ValueError("[ERROR]: No path found from start to end")
