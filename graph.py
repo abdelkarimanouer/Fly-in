@@ -10,7 +10,9 @@ class Graph:
         self.zones: List[Zone] = zones
         self.connections: List[Connection] = connections
         self.adjacency: Dict[Zone, List[Zone]] = {}
+        self._create_graph()
 
+    def _create_graph(self) -> None:
         for z in self.zones:
             self.adjacency[z] = []
         for c in self.connections:
@@ -24,12 +26,3 @@ class Graph:
             if z.name == name:
                 return z
         raise ValueError(f"Zone '{name}' not found")
-
-    def get_zone_cost(self, zone: Zone) -> int:
-        costs = {
-            "normal": 1,
-            "blocked": -1,
-            "restricted": 2,
-            "priority": 1
-        }
-        return costs.get(zone.zone_type, 1)

@@ -12,3 +12,15 @@ class Zone:
         self.zone_type: str = zone_type
         self.max_drones: int = max_drones
         self.current_drones: int = 0
+
+    def __lt__(self, other) -> bool:
+        return self.name < other.name
+
+    def get_zone_cost(self) -> int:
+        costs = {
+            "normal": 1,
+            "blocked": -1,
+            "restricted": 2,
+            "priority": 1
+        }
+        return costs.get(self.zone_type, 1)

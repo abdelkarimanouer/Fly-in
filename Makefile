@@ -1,14 +1,14 @@
-install:
-
 run:
-	@python3 main.py maps/easy/01_linear_path.txt
+	@python3 main.py $(ARG)
+
+install:
+	pip install rich
 
 debug:
-	@python3 -m pdb main.py
+	@python3 -m pdb main.py $(ARG)
 
 clean:
-	@rm -rf __pycache__
-	@rm -rf .mypy_cache
+	@rm -rf __pycache__ .mypy_cache
 
 lint:
 	@python3 -m flake8

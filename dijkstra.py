@@ -5,42 +5,42 @@ import heapq as h
 import math
 
 
-def shortest_path(graph: Graph, start: Zone, end: Zone) -> List[Zone]:
-    path: List = []
-    heap: List = []
-    visited = set()
-    parents: Dict = {}
-    costs: Dict = {}
+class Dijkstra:
 
-    for z in graph.zones:
-        costs[z.name] = math.inf
-    costs[start.name] = 0
-    h.heappush(heap, (0, start.name))
+    def shortest_path(self, graph: Graph, start: Zone,
+                      end: Zone) -> List[Zone]:
+        path: List = []
+        heap: List = []
+        visited = set()
+        parents: Dict = {}
+        costs: Dict = {}
 
-    while heap:
-        current_cost, name_zone = h.heappop(heap)
-        if name_zone in visited:
-            continue
-        visited.add(name_zone)
+        for z in graph.zones:
+            costs[z] = math.inf
+        costs[start] = 0
+        h.heappush(heap, (0, start))
 
-        if name_zone == end.name:
-            z = graph.get_zone_from_zones_list(name_zone)
-            path.append(z)
-            while name_zone != start.name:
-                z = graph.get_zone_from_zones_list(parents[name_zone])
-                path.append(z)
-                name_zone = parents[name_zone]
-            path.reverse()
-            return path
-
-        for n in graph.adjacency[graph.get_zone_from_zones_list(name_zone)]:
-            if n.zone_type == "blocked":
+        while heap:
+            current_cost, zone = h.heappop(heap)
+            if zone in visited:
                 continue
-            if n.name not in visited:
-                new_cost = current_cost + graph.get_zone_cost(n)
-                if new_cost < costs[n.name]:
-                    costs[n.name] = new_cost
-                    parents[n.name] = name_zone
-                    h.heappush(heap, (new_cost, n.name))
+            visited.add(zone)
 
-    raise ValueError("[ERROR]: No path found from start to end")
+            if zone == end:
+                path.append(zone)
+                while zone != start:
+                    path.append(parents[zone])
+                    zone = parents[zone]
+                path.reverse()
+                return path
+
+            for n in graph.adjacency[zone]:
+                if n.zone_type == "blocked":
+                    continue
+                new_cost = current_cost + n.get_zone_cost()
+                if new_cost < costs[n]:
+                    costs[n] = new_cost
+                    parents[n] = zone
+                    h.heappush(heap, (new_cost, n))
+
+        raise ValueError("[ERROR]: No path found from start to end")
