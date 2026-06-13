@@ -1,4 +1,4 @@
-from parsing import parsing_file
+from parsing import Parsing
 from sys import argv
 from graph import Graph
 from zone import Zone
@@ -8,7 +8,7 @@ def main() -> None:
     if len(argv) < 2:
         raise ValueError("[ERROR]: No input file specified")
 
-    graph: Graph = parsing_file(argv[1])
+    graph: Graph = Parsing.parsing_file(argv[1])
     for z in graph.zones:
         if z.hub_category == "start_hub":
             start: Zone = z
