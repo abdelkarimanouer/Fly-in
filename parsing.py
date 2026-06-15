@@ -155,7 +155,6 @@ class Parsing:
             print("[ERROR]: Data is missing or empty")
             exit()
 
-    @staticmethod
     def parsing_file(self, file_path: str) -> Graph:
         try:
             nb_drones: int = -1

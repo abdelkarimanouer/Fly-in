@@ -7,8 +7,8 @@ import math
 
 class Dijkstra:
 
-    def shortest_path(self, graph: Graph, start: Zone,
-                      end: Zone) -> List[Zone]:
+    @staticmethod
+    def shortest_path(graph: Graph) -> List[Zone]:
         path: List = []
         heap: List = []
         visited = set()
@@ -17,8 +17,8 @@ class Dijkstra:
 
         for z in graph.zones:
             costs[z] = math.inf
-        costs[start] = 0
-        h.heappush(heap, (0, start))
+        costs[graph.start_zone] = 0
+        h.heappush(heap, (0, graph.start_zone))
 
         while heap:
             current_cost, zone = h.heappop(heap)
@@ -26,9 +26,9 @@ class Dijkstra:
                 continue
             visited.add(zone)
 
-            if zone == end:
+            if zone == graph.end_zone:
                 path.append(zone)
-                while zone != start:
+                while zone != graph.start_zone:
                     path.append(parents[zone])
                     zone = parents[zone]
                 path.reverse()
@@ -43,4 +43,4 @@ class Dijkstra:
                     parents[n] = zone
                     h.heappush(heap, (new_cost, n))
 
-        raise ValueError("[ERROR]: No path found from start to end")
+        raise ValueError("[ERROR]: No path found from graph.start_zone to end")

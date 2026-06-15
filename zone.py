@@ -13,7 +13,7 @@ class Zone:
         self.max_drones: int = max_drones
         self.current_drones: int = 0
 
-    def __lt__(self, other) -> bool:
+    def __lt__(self, other: "Zone") -> bool:
         return self.name < other.name
 
     def get_zone_cost(self) -> int:

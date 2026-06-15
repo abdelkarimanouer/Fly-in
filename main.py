@@ -1,19 +1,20 @@
 from parsing import Parsing
 from sys import argv
 from graph import Graph
-from zone import Zone
+from simulation import Simulation
 
 
 def main() -> None:
     if len(argv) < 2:
         raise ValueError("[ERROR]: No input file specified")
 
-    graph: Graph = Parsing.parsing_file(argv[1])
-    for z in graph.zones:
-        if z.hub_category == "start_hub":
-            start: Zone = z
-        if z.hub_category == "end_hub":
-            end: Zone = z
+    parsing: Parsing = Parsing()
+    graph: Graph = parsing.parsing_file(argv[1])
+    paths = Simulation.assign_paths(graph)
+    for path in paths:
+        print()
+        print(path)
+        print()
 
 
 if __name__ == "__main__":

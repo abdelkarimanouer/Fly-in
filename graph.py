@@ -10,7 +10,17 @@ class Graph:
         self.zones: List[Zone] = zones
         self.connections: List[Connection] = connections
         self.adjacency: Dict[Zone, List[Zone]] = {}
+        self.start_zone: Zone
+        self.end_zone: Zone
+        self._get_start_end_zones()
         self._create_graph()
+
+    def _get_start_end_zones(self) -> None:
+        for z in self.zones:
+            if z.hub_category == "start_hub":
+                self.start_zone = z
+            if z.hub_category == "end_hub":
+                self.end_zone = z
 
     def _create_graph(self) -> None:
         for z in self.zones:
