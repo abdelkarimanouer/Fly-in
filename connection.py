@@ -4,4 +4,4 @@ class Connection:
         self.name1: str = name1
         self.name2: str = name2
         self.max_link_capacity: int = max_link_capacity
-        self.current_drones: int = 0
+        self.nb_drs_on_con: int = 0

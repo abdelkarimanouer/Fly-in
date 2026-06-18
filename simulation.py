@@ -50,30 +50,36 @@ class Simulation:
 
     @staticmethod
     def _get_color(color: str | None) -> Any:
+        if color is None:
+            return "white"
         if color == "rainbow":
             return "magenta"
         return name_to_hex(color)
 
     @staticmethod
     def _print_turn(moved_drones: List[Drone]) -> None:
-        rs = ' '.join(
-            f"D{d.id}-"
-            f"[{Simulation._get_color(d.current_zone.color)}]"
-            f"{d.current_zone.name}"
-            f"[/{Simulation._get_color(d.current_zone.color)}]"
-            for d in moved_drones
-        )
+        rs = ' '.join(f"D{d.id}-{d.log_output}" for d in moved_drones)
         print(rs)
 
     @staticmethod
     def start_simulation(graph: Graph, drones: List[Drone]) -> None:
-        graph.start_zone.current_drones = graph.nb_drones
+        graph.start_zone.current_drones_on_zone = graph.nb_drones
         graph.end_zone.max_drones = graph.nb_drones
         while not all(d.current_zone.hub_category
                       == "end_hub" for d in drones):
             moved_drones: List[Drone] = []
+
             for d in drones:
                 if d.current_zone.hub_category == "end_hub":
+                    continue
+                if d.turns_to_wait > 0:
+                    d.turns_to_wait -= 1
+                    if d.turns_to_wait == 0:
+                        d.current_zone = d.destination_zone
+                        d.current_zone.current_drones_on_zone += 1
+                        c1 = Simulation._get_color(d.current_zone.color)
+                        d.log_output = f"[{c1}]{d.current_zone.name}[/{c1}]"
+                        moved_drones.append(d)
                     continue
                 n_zone = d.path[d.d_pos_path]
                 for c in graph.connections:
@@ -83,16 +89,31 @@ class Simulation:
                         (c.name2 == d.current_zone.name and
                             c.name1 == n_zone.name)
                     ):
-                        if (c.current_drones < c.max_link_capacity
-                           and n_zone.current_drones < n_zone.max_drones):
-                            d.current_zone.current_drones -= 1
-                            n_zone.current_drones += 1
-                            c.current_drones += 1
-                            d.current_zone = n_zone
-                            d.d_pos_path += 1
-                            moved_drones.append(d)
+                        if (c.nb_drs_on_con < c.max_link_capacity
+                           and n_zone.current_drones_on_zone
+                           < n_zone.max_drones):
+                            if n_zone.zone_type == "restricted":
+                                d.current_zone.current_drones_on_zone -= 1
+                                c.nb_drs_on_con += 1
+                                d.turns_to_wait = 1
+                                d.destination_zone = n_zone
+                                d.d_pos_path += 1
+                                c1 = Simulation._get_color(d.current_zone.color)
+                                c2 = Simulation._get_color(n_zone.color)
+                                d.log_output = f"[{c1}]{d.current_zone.name}[/{c1}]-[{c2}]{n_zone.name}[/{c2}]"
+                                moved_drones.append(d)
+                            else:
+                                d.current_zone.current_drones_on_zone -= 1
+                                n_zone.current_drones_on_zone += 1
+                                c.nb_drs_on_con += 1
+                                d.current_zone = n_zone
+                                d.d_pos_path += 1
+                                c1 = Simulation._get_color(d.current_zone.color)
+                                d.log_output = f"[{c1}]{d.current_zone.name}[/{c1}]"
+                                moved_drones.append(d)
                         break
+
             for c in graph.connections:
-                c.current_drones = 0
+                c.nb_drs_on_con = 0
 
             Simulation._print_turn(moved_drones)

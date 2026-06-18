@@ -11,16 +11,16 @@ class Zone:
         self.color: str | None = color
         self.zone_type: str = zone_type
         self.max_drones: int = max_drones
-        self.current_drones: int = 0
+        self.current_drones_on_zone: int = 0
 
     def __lt__(self, other: "Zone") -> bool:
         return self.name < other.name
 
-    def get_zone_cost(self) -> int:
+    def get_zone_cost(self) -> float:
         costs = {
             "normal": 1,
             "blocked": -1,
             "restricted": 2,
-            "priority": 1
+            "priority": 0.8
         }
         return costs.get(self.zone_type, 1)

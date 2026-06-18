@@ -9,3 +9,6 @@ class Drone:
         self.path: List[Zone] = path
         self.d_pos_path: int = 1
         self.is_done: bool = False
+        self.turns_to_wait: int = 0
+        self.destination_zone: Zone | None = None
+        self.log_output: str = ""
