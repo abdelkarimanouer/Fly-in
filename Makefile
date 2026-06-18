@@ -3,6 +3,7 @@ run:
 
 install:
 	pip install rich
+	pip install webcolors
 
 debug:
 	@python3 -m pdb main.py $(ARG)

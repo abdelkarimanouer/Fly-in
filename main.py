@@ -10,11 +10,11 @@ def main() -> None:
 
     parsing: Parsing = Parsing()
     graph: Graph = parsing.parsing_file(argv[1])
+
     paths = Simulation.assign_paths(graph)
-    for path in paths:
-        print()
-        print(path)
-        print()
+    drones = Simulation.create_drones(graph.start_zone, graph.nb_drones)
+    Simulation.path_of_drone(drones, paths)
+    Simulation.start_simulation(graph, drones)
 
 
 if __name__ == "__main__":
