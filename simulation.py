@@ -10,8 +10,7 @@ from webcolors import name_to_hex
 class Simulation:
 
     @staticmethod
-    def create_drones(start_zone: Zone,
-                      nb_drones: int) -> List[Drone]:
+    def create_drones(start_zone: Zone, nb_drones: int) -> List[Drone]:
         drones: List[Drone] = []
         for n in range(1, nb_drones + 1):
             d = Drone(n, start_zone, [])
@@ -27,8 +26,7 @@ class Simulation:
         paths.append(best_path)
 
         for z in best_path:
-            if (z.hub_category == "start_hub" or
-                    z.hub_category == "end_hub"):
+            if z.hub_category == "start_hub" or z.hub_category == "end_hub":
                 continue
             zone_type = z.zone_type
             z.zone_type = "blocked"
@@ -58,15 +56,14 @@ class Simulation:
 
     @staticmethod
     def _print_turn(moved_drones: List[Drone]) -> None:
-        rs = ' '.join(f"D{d.id}-{d.log_output}" for d in moved_drones)
+        rs = " ".join(f"D{d.id}-{d.log_output}" for d in moved_drones)
         print(rs)
 
     @staticmethod
     def start_simulation(graph: Graph, drones: List[Drone]) -> None:
         graph.start_zone.current_drones_on_zone = graph.nb_drones
         graph.end_zone.max_drones = graph.nb_drones
-        while not all(d.current_zone.hub_category
-                      == "end_hub" for d in drones):
+        while not all(d.current_zone.hub_category == "end_hub" for d in drones):
             moved_drones: List[Drone] = []
 
             for d in drones:
@@ -83,15 +80,13 @@ class Simulation:
                     continue
                 n_zone = d.path[d.d_pos_path]
                 for c in graph.connections:
-                    if (
-                        (c.name1 == d.current_zone.name and
-                         c.name2 == n_zone.name) or
-                        (c.name2 == d.current_zone.name and
-                            c.name1 == n_zone.name)
+                    if (c.name1 == d.current_zone.name and c.name2 == n_zone.name) or (
+                        c.name2 == d.current_zone.name and c.name1 == n_zone.name
                     ):
-                        if (c.nb_drs_on_con < c.max_link_capacity
-                           and n_zone.current_drones_on_zone
-                           < n_zone.max_drones):
+                        if (
+                            c.nb_drs_on_con < c.max_link_capacity
+                            and n_zone.current_drones_on_zone < n_zone.max_drones
+                        ):
                             if n_zone.zone_type == "restricted":
                                 d.current_zone.current_drones_on_zone -= 1
                                 c.nb_drs_on_con += 1

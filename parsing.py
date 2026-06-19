@@ -6,7 +6,7 @@ from typing import List, Dict
 
 class Parsing:
 
-    def _get_nb_drones(self, line: str) -> int:
+    def _get_nb_drones(self, line: str, line_num: int) -> int:
 
         nb_drones: int = 0
 
@@ -17,7 +17,7 @@ class Parsing:
         try:
             nb_drones = int(s[1])
         except Exception:
-            print("[ERROR]: Invalid nb_drones (nb_drones: <number>)")
+            print(f"[ERROR] line <{line_num}>: Invalid nb_drones (nb_drones: <number>)")
             exit()
         if nb_drones <= 0:
             return -1
@@ -40,7 +40,7 @@ class Parsing:
             if "=" in d:
                 meta = d.split("=")
                 if len(meta) < 2:
-                    print("[ERROR]: metadata should be like this data=value")
+                    print(f"[ERROR] line <{line_num}>: metadata should be like this data=value")
                     exit()
                 data = meta[0]
                 value = meta[1]
@@ -53,37 +53,38 @@ class Parsing:
                 elif data == "zone":
                     valid = ["normal", "blocked", "restricted", "priority"]
                     if value not in valid:
-                        print(f"[ERROR]: invalid zone type '{value}'")
+                        print(f"[ERROR] line <{line_num}>: invalid zone type '{value}'")
                         exit()
                     default_data["zone_type"] = value
                 elif data == "max_drones":
                     try:
                         default_data["max_drones"] = int(value)
                     except Exception:
-                        print("[ERROR]: max_drones should be integer")
+                        print(f"[ERROR] line <{line_num}>: max_drones should be integer")
+                        exit()
                 else:
-                    print("[ERROR]: Invalid metadata")
+                    print(f"[ERROR] line <{line_num}>: Invalid metadata")
                     exit()
             else:
-                print("[ERROR]: metadata should be like this data=value")
+                print(f"[ERROR] line <{line_num}>: metadata should be like this data=value")
                 exit()
         return default_data
 
     def _parse_hub(self, line: str, zones: List[Zone], hub_category: str,
                    already_found: bool, line_num: int) -> None:
         if already_found:
-            print("[ERROR]: duplicate line found")
+            print(f"[ERROR] line <{line_num}>: duplicate line found")
             exit()
         data: List = line.split()
         if len(data) < 4:
-            print(f"[ERROR]: some data is messing in line <{line_num}>")
+            print(f"[ERROR] line <{line_num}>: some data is missing")
             exit()
         name: str = data[1]
         try:
             x: int = int(data[2])
             y: int = int(data[3])
         except Exception:
-            print("[ERROR]: coordinates must be integers")
+            print(f"[ERROR] line <{line_num}>: coordinates must be integers")
             exit()
         metadata: Dict = self._parse_metadata_zones(data[4:], line_num)
         zone = Zone(hub_category, name, (x, y), metadata['color'],
@@ -91,12 +92,11 @@ class Parsing:
 
         for z in zones:
             if (z.name == zone.name) or (z.coordinate == zone.coordinate):
-                print("[ERROR]: Every Zone should has unique "
-                      "name | coordinate")
+                print(f"[ERROR] line <{line_num}>: Every Zone should have unique name | coordinate")
                 exit()
         zones.append(zone)
 
-    def _parse_connection(sefl, line: str, connections: List[Connection],
+    def _parse_connection(self, line: str, connections: List[Connection],
                           zones: List[Zone], line_num: int) -> None:
 
         data = line.split()
@@ -106,7 +106,7 @@ class Parsing:
             if len(names) == 2:
                 name1, name2 = names[0].strip(), names[1].strip()
                 if not name1 or not name2:
-                    print("[ERROR]: One or both zones are empty")
+                    print(f"[ERROR] line <{line_num}>: One or both zones are empty")
                     exit()
                 name1_found = False
                 name2_found = False
@@ -116,29 +116,26 @@ class Parsing:
                     if name2 == z.name:
                         name2_found = True
                 if name1_found is False or name2_found is False:
-                    print("[ERROR]: One or both zones are empty")
+                    print(f"[ERROR] line <{line_num}>: One or both zones do not exist")
                     exit()
             else:
-                print("[ERROR]: Invalid format. Expected connection "
-                      "like this zone1-zone2.")
+                print(f"[ERROR] line <{line_num}>: Invalid format. Expected connection: zone1-zone2")
                 exit()
             if len(data) > 2:
                 if "=" in data[2]:
                     data[2] = data[2].strip("[]")
                     _, value = data[2].split("=")
                     if not value:
-                        print("[ERROR]: metadata should be like "
-                              "this max_link_capacity=<value>")
+                        print(f"[ERROR] line <{line_num}>: max_link_capacity value cannot be empty")
                         exit()
                     try:
                         v = int(value)
                     except Exception:
-                        print("[ERROR]: coordinates must be integers")
+                        print(f"[ERROR] line <{line_num}>: max_link_capacity must be an integer")
                         exit()
                     connection = Connection(name1, name2, v)
                 else:
-                    print("[ERROR]: metadata should be like "
-                          "this max_link_capacity=<value>")
+                    print(f"[ERROR] line <{line_num}>: metadata should be like [max_link_capacity=value]")
                     exit()
             else:
                 connection = Connection(name1, name2, 1)
@@ -148,11 +145,11 @@ class Parsing:
                     (connection.name2 == c.name2) or
                     (connection.name1 == c.name2 and
                      connection.name2 == c.name1)):
-                    print("[ERROR]: connections should be unique")
+                    print(f"[ERROR] line <{line_num}>: duplicate connection found")
                     exit()
             connections.append(connection)
         else:
-            print("[ERROR]: Data is missing or empty")
+            print(f"[ERROR] line <{line_num}>: Connection data is missing or empty")
             exit()
 
     def parsing_file(self, file_path: str) -> Graph:
@@ -173,15 +170,15 @@ class Parsing:
                     continue
                 if line.startswith("nb_drones"):
                     if nb_drones_found:
-                        print("[ERROR]: nb_drones should not be duplicated")
+                        print(f"[ERROR] line <{i}>: nb_drones should not be duplicated")
                         exit()
-                    nb_drones = self._get_nb_drones(line)
+                    nb_drones = self._get_nb_drones(line, i)
                     if nb_drones == -1:
-                        print("[ERROR]: nb_drones must be positive")
+                        print(f"[ERROR] line <{i}>: nb_drones must be positive")
                         exit()
                     nb_drones_found = True
                 elif nb_drones == -1:
-                    print("[ERROR]: nb_drones must be the first line")
+                    print(f"[ERROR] line <{i}>: nb_drones must be the first line")
                     exit()
                 elif line.startswith("start_hub"):
                     self._parse_hub(line, zones, "start_hub",
@@ -205,6 +202,10 @@ class Parsing:
                 print("[ERROR]: end_hub is missing")
                 exit()
             return Graph(nb_drones, zones, connections)
+
+        except FileNotFoundError:
+            print(f"[ERROR]: The map file '{file_path}' was not found")
+            exit()
         except Exception as e:
-            print("[ERROR]:", e)
+            print(f"[ERROR]: System failure while reading file: {e}")
             exit()
