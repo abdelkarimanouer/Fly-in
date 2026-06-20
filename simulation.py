@@ -63,48 +63,50 @@ class Simulation:
     def start_simulation(graph: Graph, drones: List[Drone]) -> None:
         graph.start_zone.current_drones_on_zone = graph.nb_drones
         graph.end_zone.max_drones = graph.nb_drones
-        while not all(d.current_zone.hub_category == "end_hub" for d in drones):
+        while not all(
+            d.cur_z.hub_category == "end_hub" for d in drones
+        ):
             moved_drones: List[Drone] = []
 
             for d in drones:
-                if d.current_zone.hub_category == "end_hub":
+                if d.cur_z.hub_category == "end_hub":
                     continue
                 if d.turns_to_wait > 0:
                     d.turns_to_wait -= 1
                     if d.turns_to_wait == 0:
-                        d.current_zone = d.destination_zone
-                        d.current_zone.current_drones_on_zone += 1
-                        c1 = Simulation._get_color(d.current_zone.color)
-                        d.log_output = f"[{c1}]{d.current_zone.name}[/{c1}]"
+                        if d.destination_zone is not None:
+                            d.cur_z = d.destination_zone
+                        d.cur_z.current_drones_on_zone += 1
+                        c1 = Simulation._get_color(d.cur_z.color)
+                        d.log_output = f"[{c1}]{d.cur_z.name}[/{c1}]"
                         moved_drones.append(d)
                     continue
-                n_zone = d.path[d.d_pos_path]
+                n_z = d.path[d.d_pos_path]
                 for c in graph.connections:
-                    if (c.name1 == d.current_zone.name and c.name2 == n_zone.name) or (
-                        c.name2 == d.current_zone.name and c.name1 == n_zone.name
-                    ):
+                    if {c.name1, c.name2} == {d.cur_z.name, n_z.name}:
                         if (
                             c.nb_drs_on_con < c.max_link_capacity
-                            and n_zone.current_drones_on_zone < n_zone.max_drones
+                            and n_z.current_drones_on_zone < n_z.max_drones
                         ):
-                            if n_zone.zone_type == "restricted":
-                                d.current_zone.current_drones_on_zone -= 1
+                            if n_z.zone_type == "restricted":
+                                d.cur_z.current_drones_on_zone -= 1
                                 c.nb_drs_on_con += 1
                                 d.turns_to_wait = 1
-                                d.destination_zone = n_zone
+                                d.destination_zone = n_z
                                 d.d_pos_path += 1
-                                c1 = Simulation._get_color(d.current_zone.color)
-                                c2 = Simulation._get_color(n_zone.color)
-                                d.log_output = f"[{c1}]{d.current_zone.name}[/{c1}]-[{c2}]{n_zone.name}[/{c2}]"
+                                c1 = Simulation._get_color(d.cur_z.color)
+                                c2 = Simulation._get_color(n_z.color)
+                                d.log_output = f"[{c1}]{d.cur_z.name}\
+[/{c1}]-[{c2}]{n_z.name}[/{c2}]"
                                 moved_drones.append(d)
                             else:
-                                d.current_zone.current_drones_on_zone -= 1
-                                n_zone.current_drones_on_zone += 1
+                                d.cur_z.current_drones_on_zone -= 1
+                                n_z.current_drones_on_zone += 1
                                 c.nb_drs_on_con += 1
-                                d.current_zone = n_zone
+                                d.cur_z = n_z
                                 d.d_pos_path += 1
-                                c1 = Simulation._get_color(d.current_zone.color)
-                                d.log_output = f"[{c1}]{d.current_zone.name}[/{c1}]"
+                                c1 = Simulation._get_color(d.cur_z.color)
+                                d.log_output = f"[{c1}]{d.cur_z.name}[/{c1}]"
                                 moved_drones.append(d)
                         break
 

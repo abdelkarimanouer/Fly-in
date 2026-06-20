@@ -17,7 +17,8 @@ class Parsing:
         try:
             nb_drones = int(s[1])
         except Exception:
-            print(f"[ERROR] line <{line_num}>: Invalid nb_drones (nb_drones: <number>)")
+            print(f"[ERROR] line <{line_num}>: Invalid nb_drones "
+                  f"(nb_drones: <number>)")
             exit()
         if nb_drones <= 0:
             return -1
@@ -40,7 +41,8 @@ class Parsing:
             if "=" in d:
                 meta = d.split("=")
                 if len(meta) < 2:
-                    print(f"[ERROR] line <{line_num}>: metadata should be like this data=value")
+                    print(f"[ERROR] line <{line_num}>: metadata should be "
+                          f"like this data=value")
                     exit()
                 data = meta[0]
                 value = meta[1]
@@ -53,20 +55,23 @@ class Parsing:
                 elif data == "zone":
                     valid = ["normal", "blocked", "restricted", "priority"]
                     if value not in valid:
-                        print(f"[ERROR] line <{line_num}>: invalid zone type '{value}'")
+                        print(f"[ERROR] line <{line_num}>: "
+                              f"invalid zone type '{value}'")
                         exit()
                     default_data["zone_type"] = value
                 elif data == "max_drones":
                     try:
                         default_data["max_drones"] = int(value)
                     except Exception:
-                        print(f"[ERROR] line <{line_num}>: max_drones should be integer")
+                        print(f"[ERROR] line <{line_num}>: "
+                              f"max_drones should be integer")
                         exit()
                 else:
                     print(f"[ERROR] line <{line_num}>: Invalid metadata")
                     exit()
             else:
-                print(f"[ERROR] line <{line_num}>: metadata should be like this data=value")
+                print(f"[ERROR] line <{line_num}>: metadata should be "
+                      f"like this data=value")
                 exit()
         return default_data
 
@@ -92,7 +97,8 @@ class Parsing:
 
         for z in zones:
             if (z.name == zone.name) or (z.coordinate == zone.coordinate):
-                print(f"[ERROR] line <{line_num}>: Every Zone should have unique name | coordinate")
+                print(f"[ERROR] line <{line_num}>: Every Zone should "
+                      f"have unique name | coordinate")
                 exit()
         zones.append(zone)
 
@@ -106,7 +112,8 @@ class Parsing:
             if len(names) == 2:
                 name1, name2 = names[0].strip(), names[1].strip()
                 if not name1 or not name2:
-                    print(f"[ERROR] line <{line_num}>: One or both zones are empty")
+                    print(f"[ERROR] line <{line_num}>: One or "
+                          f"both zones are empty")
                     exit()
                 name1_found = False
                 name2_found = False
@@ -116,26 +123,31 @@ class Parsing:
                     if name2 == z.name:
                         name2_found = True
                 if name1_found is False or name2_found is False:
-                    print(f"[ERROR] line <{line_num}>: One or both zones do not exist")
+                    print(f"[ERROR] line <{line_num}>: One or both "
+                          f"zones do not exist")
                     exit()
             else:
-                print(f"[ERROR] line <{line_num}>: Invalid format. Expected connection: zone1-zone2")
+                print(f"[ERROR] line <{line_num}>: Invalid format. Expected "
+                      f"connection: zone1-zone2")
                 exit()
             if len(data) > 2:
                 if "=" in data[2]:
                     data[2] = data[2].strip("[]")
                     _, value = data[2].split("=")
                     if not value:
-                        print(f"[ERROR] line <{line_num}>: max_link_capacity value cannot be empty")
+                        print(f"[ERROR] line <{line_num}>: max_link_capacity "
+                              f"value cannot be empty")
                         exit()
                     try:
                         v = int(value)
                     except Exception:
-                        print(f"[ERROR] line <{line_num}>: max_link_capacity must be an integer")
+                        print(f"[ERROR] line <{line_num}>: max_link_capacity "
+                              f"must be an integer")
                         exit()
                     connection = Connection(name1, name2, v)
                 else:
-                    print(f"[ERROR] line <{line_num}>: metadata should be like [max_link_capacity=value]")
+                    print(f"[ERROR] line <{line_num}>: metadata should "
+                          f"be like [max_link_capacity=value]")
                     exit()
             else:
                 connection = Connection(name1, name2, 1)
@@ -145,11 +157,13 @@ class Parsing:
                     (connection.name2 == c.name2) or
                     (connection.name1 == c.name2 and
                      connection.name2 == c.name1)):
-                    print(f"[ERROR] line <{line_num}>: duplicate connection found")
+                    print(f"[ERROR] line <{line_num}>: duplicate "
+                          f"connection found")
                     exit()
             connections.append(connection)
         else:
-            print(f"[ERROR] line <{line_num}>: Connection data is missing or empty")
+            print(f"[ERROR] line <{line_num}>: Connection data "
+                  f"is missing or empty")
             exit()
 
     def parsing_file(self, file_path: str) -> Graph:
@@ -170,15 +184,18 @@ class Parsing:
                     continue
                 if line.startswith("nb_drones"):
                     if nb_drones_found:
-                        print(f"[ERROR] line <{i}>: nb_drones should not be duplicated")
+                        print(f"[ERROR] line <{i}>: nb_drones should "
+                              f"not be duplicated")
                         exit()
                     nb_drones = self._get_nb_drones(line, i)
                     if nb_drones == -1:
-                        print(f"[ERROR] line <{i}>: nb_drones must be positive")
+                        print(f"[ERROR] line <{i}>: nb_drones "
+                              f"must be positive")
                         exit()
                     nb_drones_found = True
                 elif nb_drones == -1:
-                    print(f"[ERROR] line <{i}>: nb_drones must be the first line")
+                    print(f"[ERROR] line <{i}>: nb_drones "
+                          f"must be the first line")
                     exit()
                 elif line.startswith("start_hub"):
                     self._parse_hub(line, zones, "start_hub",
