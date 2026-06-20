@@ -76,10 +76,15 @@ class Simulation:
                     if d.turns_to_wait == 0:
                         if d.destination_zone is not None:
                             d.cur_z = d.destination_zone
-                        d.cur_z.current_drones_on_zone += 1
-                        c1 = Simulation._get_color(d.cur_z.color)
-                        d.log_output = f"[{c1}]{d.cur_z.name}[/{c1}]"
-                        moved_drones.append(d)
+                            d.cur_z.current_drones_on_zone += 1
+                            c1 = Simulation._get_color(d.cur_z.color)
+                            d.log_output = f"[{c1}]{d.cur_z.name}[/{c1}]"
+                            moved_drones.append(d)
+                            d.destination_zone = None
+                        else:
+                            print("[ERROR]: Simulation failure - Drone \
+finished transit with no destination zone.")
+                            exit()
                     continue
                 n_z = d.path[d.d_pos_path]
                 for c in graph.connections:
