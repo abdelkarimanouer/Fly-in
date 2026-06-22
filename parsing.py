@@ -183,6 +183,7 @@ class Parsing:
                 if line.startswith("#") or len(line) == 0:
                     continue
                 if line.startswith("nb_drones"):
+                    line = self.remove_comments(line)
                     if nb_drones_found:
                         print(f"[ERROR] line <{i}>: nb_drones should "
                               f"not be duplicated")
@@ -198,16 +199,20 @@ class Parsing:
                           f"must be the first line")
                     exit()
                 elif line.startswith("start_hub"):
+                    line = self.remove_comments(line)
                     self._parse_hub(line, zones, "start_hub",
                                     start_hub_found, i)
                     start_hub_found = True
                 elif line.startswith("end_hub"):
+                    line = self.remove_comments(line)
                     self._parse_hub(line, zones, "end_hub",
                                     end_hub_found, i)
                     end_hub_found = True
                 elif line.startswith("hub"):
+                    line = self.remove_comments(line)
                     self._parse_hub(line, zones, "hub", False, i)
                 elif line.startswith("connection"):
+                    line = self.remove_comments(line)
                     self._parse_connection(line, connections, zones, i)
                 else:
                     print(f"[ERROR] line <{i}>: invalid syntax")
@@ -226,3 +231,7 @@ class Parsing:
         except Exception as e:
             print(f"[ERROR]: System failure while reading file: {e}")
             exit()
+
+    def remove_comments(self, line: str) -> str:
+        line_splited = line.split("#")
+        return line_splited[0]
