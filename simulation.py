@@ -46,60 +46,94 @@ class Simulation:
         print(rs)
 
     @staticmethod
+    def _handle_waiting_drone(d: Drone, moved_drones: List[Drone]
+                              ) -> bool:
+        if d.turns_to_wait <= 0:
+            return False
+
+        d.turns_to_wait -= 1
+
+        if d.turns_to_wait == 0:
+            if d.destination_zone is not None:
+                d.cur_z = d.destination_zone
+                d.cur_z.current_drones_on_zone += 1
+
+                c1 = Simulation._get_color(d.cur_z.color)
+                d.log_output = f"[{c1}]{d.cur_z.name}[/{c1}]"
+
+                moved_drones.append(d)
+                d.destination_zone = None
+            else:
+                print(
+                    "[ERROR]: Simulation failure - Drone "
+                    "finished transit with no destination zone."
+                )
+                exit()
+
+        return True
+
+    @staticmethod
+    def _move_drone(d: Drone, graph: Graph, moved_drones: List[Drone]
+                    ) -> None:
+        n_z = d.path[d.d_pos_path]
+
+        for c in graph.connections:
+            if {c.name1, c.name2} == {d.cur_z.name, n_z.name}:
+                if (
+                    c.nb_drs_on_con < c.max_link_capacity
+                    and n_z.current_drones_on_zone < n_z.max_drones
+                ):
+                    if n_z.zone_type == "restricted":
+                        d.cur_z.current_drones_on_zone -= 1
+                        c.nb_drs_on_con += 1
+                        d.turns_to_wait = 1
+                        d.destination_zone = n_z
+                        d.d_pos_path += 1
+
+                        c1 = Simulation._get_color(d.cur_z.color)
+                        c2 = Simulation._get_color(n_z.color)
+
+                        d.log_output = (
+                            f"[{c1}]{d.cur_z.name}[/{c1}]"
+                            f"-[{c2}]{n_z.name}[/{c2}]"
+                        )
+
+                        moved_drones.append(d)
+                    else:
+                        d.cur_z.current_drones_on_zone -= 1
+                        n_z.current_drones_on_zone += 1
+                        c.nb_drs_on_con += 1
+                        d.cur_z = n_z
+                        d.d_pos_path += 1
+
+                        c1 = Simulation._get_color(d.cur_z.color)
+                        d.log_output = f"[{c1}]{d.cur_z.name}[/{c1}]"
+
+                        moved_drones.append(d)
+                break
+
+    @staticmethod
     def start_simulation(graph: Graph, drones: List[Drone]) -> None:
         graph.start_zone.current_drones_on_zone = graph.nb_drones
         graph.end_zone.max_drones = graph.nb_drones
+
         while not all(
-            d.cur_z.hub_category == "end_hub" for d in drones
+            d.cur_z.hub_category == "end_hub"
+            for d in drones
         ):
             moved_drones: List[Drone] = []
 
             for d in drones:
                 if d.cur_z.hub_category == "end_hub":
                     continue
-                if d.turns_to_wait > 0:
-                    d.turns_to_wait -= 1
-                    if d.turns_to_wait == 0:
-                        if d.destination_zone is not None:
-                            d.cur_z = d.destination_zone
-                            d.cur_z.current_drones_on_zone += 1
-                            c1 = Simulation._get_color(d.cur_z.color)
-                            d.log_output = f"[{c1}]{d.cur_z.name}[/{c1}]"
-                            moved_drones.append(d)
-                            d.destination_zone = None
-                        else:
-                            print("[ERROR]: Simulation failure - Drone \
-finished transit with no destination zone.")
-                            exit()
+
+                if Simulation._handle_waiting_drone(
+                    d,
+                    moved_drones,
+                ):
                     continue
-                n_z = d.path[d.d_pos_path]
-                for c in graph.connections:
-                    if {c.name1, c.name2} == {d.cur_z.name, n_z.name}:
-                        if (
-                            c.nb_drs_on_con < c.max_link_capacity
-                            and n_z.current_drones_on_zone < n_z.max_drones
-                        ):
-                            if n_z.zone_type == "restricted":
-                                d.cur_z.current_drones_on_zone -= 1
-                                c.nb_drs_on_con += 1
-                                d.turns_to_wait = 1
-                                d.destination_zone = n_z
-                                d.d_pos_path += 1
-                                c1 = Simulation._get_color(d.cur_z.color)
-                                c2 = Simulation._get_color(n_z.color)
-                                d.log_output = f"[{c1}]{d.cur_z.name}\
-[/{c1}]-[{c2}]{n_z.name}[/{c2}]"
-                                moved_drones.append(d)
-                            else:
-                                d.cur_z.current_drones_on_zone -= 1
-                                n_z.current_drones_on_zone += 1
-                                c.nb_drs_on_con += 1
-                                d.cur_z = n_z
-                                d.d_pos_path += 1
-                                c1 = Simulation._get_color(d.cur_z.color)
-                                d.log_output = f"[{c1}]{d.cur_z.name}[/{c1}]"
-                                moved_drones.append(d)
-                        break
+
+                Simulation._move_drone(d, graph, moved_drones)
 
             for c in graph.connections:
                 c.nb_drs_on_con = 0
