@@ -2,6 +2,7 @@ from parsing import Parsing
 from sys import argv
 from graph import Graph
 from simulation import Simulation
+from drone import Drone
 
 
 def main() -> None:
@@ -11,9 +12,11 @@ def main() -> None:
     parsing: Parsing = Parsing()
     graph: Graph = parsing.parsing_file(argv[1])
 
+    drones = Drone.create_drones(graph.start_zone, graph.nb_drones)
+
     paths = Simulation.assign_paths(graph)
-    drones = Simulation.create_drones(graph.start_zone, graph.nb_drones)
-    Simulation.path_of_drone(drones, paths)
+    Drone.path_of_drone(drones, paths)
+
     Simulation.start_simulation(graph, drones)
 
 

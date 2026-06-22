@@ -10,14 +10,6 @@ from webcolors import name_to_hex
 class Simulation:
 
     @staticmethod
-    def create_drones(start_zone: Zone, nb_drones: int) -> List[Drone]:
-        drones: List[Drone] = []
-        for n in range(1, nb_drones + 1):
-            d = Drone(n, start_zone, [])
-            drones.append(d)
-        return drones
-
-    @staticmethod
     def assign_paths(graph: Graph) -> List[List[Zone]]:
         paths: List[List[Zone]] = []
         zone_type: str = ""
@@ -39,12 +31,6 @@ class Simulation:
             finally:
                 z.zone_type = zone_type
         return paths
-
-    @staticmethod
-    def path_of_drone(drones: List[Drone], paths: List[List[Zone]]) -> None:
-        l_paths = len(paths)
-        for d in drones:
-            d.path = paths[d.id % l_paths]
 
     @staticmethod
     def _get_color(color: str | None) -> Any:

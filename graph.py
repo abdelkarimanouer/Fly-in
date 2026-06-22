@@ -18,8 +18,10 @@ class Graph:
     def _get_start_end_zones(self) -> None:
         for z in self.zones:
             if z.hub_category == "start_hub":
+                z.max_drones = self.nb_drones
                 self.start_zone = z
             if z.hub_category == "end_hub":
+                z.max_drones = self.nb_drones
                 self.end_zone = z
 
     def _create_graph(self) -> None:

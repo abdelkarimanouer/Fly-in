@@ -12,3 +12,22 @@ class Drone:
         self.turns_to_wait: int = 0
         self.destination_zone: Zone | None = None
         self.log_output: str = ""
+
+    @staticmethod
+    def create_drones(start_zone: Zone, nb_drones: int) -> List["Drone"]:
+        drones: List[Drone] = []
+        for n in range(1, nb_drones + 1):
+            d = Drone(n, start_zone, [])
+            drones.append(d)
+        return drones
+
+    @staticmethod
+    def path_of_drone(drones: List["Drone"], paths: List[List[Zone]]) -> None:
+        l_paths = len(paths)
+        if l_paths == 0:
+            print("[ERROR]: No valid paths were found from \
+start_hub to end_hub!")
+            exit()
+
+        for d in drones:
+            d.path = paths[(d.id - 1) % l_paths]
