@@ -20,14 +20,3 @@ class Drone:
             d = Drone(n, start_zone, [])
             drones.append(d)
         return drones
-
-    @staticmethod
-    def path_of_drone(drones: List["Drone"], paths: List[List[Zone]]) -> None:
-        l_paths = len(paths)
-        if l_paths == 0:
-            print("[ERROR]: No valid paths were found from \
-start_hub to end_hub!")
-            exit()
-
-        for d in drones:
-            d.path = paths[(d.id - 1) % l_paths]
