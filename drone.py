@@ -20,3 +20,8 @@ class Drone:
             d = Drone(n, start_zone, [])
             drones.append(d)
         return drones
+
+    @staticmethod
+    def path_drone(drones: List["Drone"], all_paths: List[List[Zone]]) -> None:
+        for i in range(len(drones)):
+            drones[i].path = all_paths[i]
