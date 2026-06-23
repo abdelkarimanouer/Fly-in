@@ -125,12 +125,10 @@ class Simulation:
                     )
 
                     if has_capacity:
-                        # Free up space from the old hub instantly
                         if d.cur_z.hub_category != "start_hub":
                             zone_occupancy[d.cur_z.name] -= 1
 
                         if next_zone.zone_type == "restricted":
-                            # Initiate 2-turn sequence
                             d.turns_to_wait = 1
                             d.destination_zone = next_zone
 
