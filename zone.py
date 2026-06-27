@@ -2,9 +2,13 @@ from typing import Tuple
 
 
 class Zone:
+    """A single zone in the drone network."""
+
     def __init__(self, hub_category: str, name: str, coordinate: Tuple,
                  color: str | None = None, zone_type: str = "normal",
                  max_drones: int = 1) -> None:
+        """Set up a zone with its name, type, color, and capacity."""
+
         self.hub_category: str = hub_category
         self.name: str = name
         self.coordinate: Tuple = coordinate
@@ -14,9 +18,13 @@ class Zone:
         self.current_drones_on_zone: int = 0
 
     def __lt__(self, other: "Zone") -> bool:
+        """Compare zones by name for sorting."""
+
         return self.name < other.name
 
     def get_zone_cost(self) -> float:
+        """Return the movement cost of this zone."""
+
         costs = {
             "normal": 1,
             "blocked": -1,

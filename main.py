@@ -6,6 +6,8 @@ from simulation import Simulation
 
 
 def main() -> None:
+    """Parse the map file, set up drones, and run the simulation."""
+
     if len(argv) < 2:
         raise ValueError("[ERROR]: No input file specified")
 

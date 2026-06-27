@@ -5,8 +5,10 @@ from typing import List, Dict
 
 
 class Parsing:
+    """Reads and validates the map file, builds the graph."""
 
     def _get_nb_drones(self, line: str, line_num: int) -> int:
+        """Read and return the number of drones from the line."""
 
         nb_drones: int = 0
 
@@ -27,6 +29,8 @@ class Parsing:
 
     def _parse_metadata_zones(self, meta_data: List[str],
                               line_num: int) -> Dict:
+        """Parse and return zone metadata like color, type, max_drones."""
+
         default_data = {'color': None, 'zone_type': "normal",
                         'max_drones': 1
                         }
@@ -77,6 +81,8 @@ class Parsing:
 
     def _parse_hub(self, line: str, zones: List[Zone], hub_category: str,
                    already_found: bool, line_num: int) -> None:
+        """Parse a hub line and add the zone to the list."""
+
         if already_found:
             print(f"[ERROR] line <{line_num}>: duplicate line found")
             exit()
@@ -104,6 +110,7 @@ class Parsing:
 
     def _parse_connection(self, line: str, connections: List[Connection],
                           zones: List[Zone], line_num: int) -> None:
+        """Parse a connection line and add it to the list."""
 
         data = line.split()
         if data and len(data) > 1 and data[1]:
@@ -167,6 +174,8 @@ class Parsing:
             exit()
 
     def parsing_file(self, file_path: str) -> Graph:
+        """Read the map file line by line and return a Graph."""
+
         try:
             nb_drones: int = -1
             zones: List[Zone] = []
@@ -233,5 +242,7 @@ class Parsing:
             exit()
 
     def remove_comments(self, line: str) -> str:
+        """Strip inline comments from a line."""
+
         line_splited = line.split("#")
         return line_splited[0]

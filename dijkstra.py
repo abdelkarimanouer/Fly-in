@@ -6,9 +6,12 @@ import math
 
 
 class Dijkstra:
+    """Finds the shortest path from start to end in the graph."""
 
     @staticmethod
     def shortest_path(graph: Graph) -> List[Zone]:
+        """Find the cheapest path from start zone to end zone."""
+
         path: List = []
         heap: List = []
         visited = set()
@@ -34,9 +37,16 @@ class Dijkstra:
                 path.reverse()
                 return path
 
-            for n in graph.adjacency[zone]:
-                if n.zone_type == "blocked":
+            valid_neighbors = [n for n in graph.adjacency[zone]
+                               if n.zone_type != "blocked"
+                               and n not in visited]
+            has_priority_neighbor = any(n.zone_type == "priority"
+                                        for n in valid_neighbors)
+
+            for n in valid_neighbors:
+                if has_priority_neighbor and n.zone_type != "priority":
                     continue
+
                 new_cost = current_cost + n.get_zone_cost()
                 if new_cost < costs[n]:
                     costs[n] = new_cost
