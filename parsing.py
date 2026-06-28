@@ -40,7 +40,7 @@ class Parsing:
         parts = parts.strip("[] ")
         color_found: bool = False
         zonetype_found: bool = False
-        max_number_found: bool = False
+        max_drones_found: bool = False
         if not parts:
             return default_data
         data_parts = parts.split()
@@ -68,10 +68,15 @@ class Parsing:
                         exit()
                     zonetype_found = True
                     default_data["zone_type"] = value
-                elif data == "max_drones" and max_number_found is False:
+                elif data == "max_drones" and max_drones_found is False:
                     try:
-                        default_data["max_drones"] = int(value)
-                        max_number_found = True
+                        max_drones_found = True
+                        v = int(value)
+                        if v <= 0:
+                            print(f"[ERROR] line <{line_num}>: "
+                                  f"max_drones should be positive")
+                            exit()
+                        default_data["max_drones"] = v
                     except Exception:
                         print(f"[ERROR] line <{line_num}>: "
                               f"max_drones should be integer")
@@ -167,6 +172,10 @@ class Parsing:
                         try:
                             v = int(value)
                             max_link_capacity_found = True
+                            if v <= 0:
+                                print(f"[ERROR] line <{line_num}>: "
+                                      f"max_drones should be positive")
+                                exit()
                         except ValueError:
                             print(f"[ERROR] line <{line_num}>: "
                                   f"max_link_capacity "
@@ -256,7 +265,9 @@ class Parsing:
                 print("[ERROR]: end_hub is missing")
                 exit()
             return Graph(nb_drones, zones, connections)
-
+        except PermissionError:
+            print("[ERROR]: The File Can't Be Opened !!")
+            exit()
         except FileNotFoundError:
             print(f"[ERROR]: The map file '{file_path}' was not found")
             exit()
