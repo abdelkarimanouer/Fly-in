@@ -38,6 +38,9 @@ class Parsing:
             return default_data
         parts = ''.join(d + " " for d in meta_data)
         parts = parts.strip("[] ")
+        color_found: bool = False
+        zonetype_found: bool = False
+        max_number_found: bool = False
         if not parts:
             return default_data
         data_parts = parts.split()
@@ -54,18 +57,21 @@ class Parsing:
                     print(f"[ERROR] line <{line_num}>: metadata data|value"
                           f" cannot be empty")
                     exit()
-                if data == "color":
+                if data == "color" and color_found is False:
+                    color_found = True
                     default_data["color"] = value
-                elif data == "zone":
+                elif data == "zone" and zonetype_found is False:
                     valid = ["normal", "blocked", "restricted", "priority"]
                     if value not in valid:
                         print(f"[ERROR] line <{line_num}>: "
                               f"invalid zone type '{value}'")
                         exit()
+                    zonetype_found = True
                     default_data["zone_type"] = value
-                elif data == "max_drones":
+                elif data == "max_drones" and max_number_found is None:
                     try:
                         default_data["max_drones"] = int(value)
+                        max_number_found = True
                     except Exception:
                         print(f"[ERROR] line <{line_num}>: "
                               f"max_drones should be integer")
@@ -113,6 +119,8 @@ class Parsing:
         """Parse a connection line and add it to the list."""
 
         data = line.split()
+        max_link_capacity_found: bool = False
+        connection: Connection
         if data and len(data) > 1 and data[1]:
 
             names = data[1].split('-')
@@ -138,24 +146,39 @@ class Parsing:
                       f"connection: zone1-zone2")
                 exit()
             if len(data) > 2:
-                if "=" in data[2]:
-                    data[2] = data[2].strip("[]")
-                    _, value = data[2].split("=")
-                    if not value:
-                        print(f"[ERROR] line <{line_num}>: max_link_capacity "
-                              f"value cannot be empty")
+                raw_meta = ' '.join(data[2:]).strip("[] ")
+                meta_parts = raw_meta.split()
+                for part in meta_parts:
+                    if "=" not in part:
+                        print(f"[ERROR] line <{line_num}>: metadata should "
+                              f"be like [max_link_capacity=value]")
                         exit()
-                    try:
-                        v = int(value)
-                    except Exception:
-                        print(f"[ERROR] line <{line_num}>: max_link_capacity "
-                              f"must be an integer")
+                    key, value = part.split("=")
+                    if key == "max_link_capacity":
+                        if max_link_capacity_found:
+                            print(f"[ERROR] line <{line_num}>: "
+                                  f"max_link_capacity is duplicated")
+                            exit()
+                        if not value:
+                            print(f"[ERROR] line <{line_num}>: "
+                                  f"max_link_capacity "
+                                  f"value cannot be empty")
+                            exit()
+                        try:
+                            v = int(value)
+                            max_link_capacity_found = True
+                        except ValueError:
+                            print(f"[ERROR] line <{line_num}>: "
+                                  f"max_link_capacity "
+                                  f"must be an integer")
+                            exit()
+                        connection = Connection(name1, name2, v)
+                    else:
+                        print(f"[ERROR] line <{line_num}>: metadata should "
+                              f"be like [max_link_capacity=value]")
                         exit()
-                    connection = Connection(name1, name2, v)
-                else:
-                    print(f"[ERROR] line <{line_num}>: metadata should "
-                          f"be like [max_link_capacity=value]")
-                    exit()
+                if not max_link_capacity_found:
+                    connection = Connection(name1, name2, 1)
             else:
                 connection = Connection(name1, name2, 1)
             for c in connections:
