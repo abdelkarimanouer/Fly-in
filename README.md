@@ -28,7 +28,7 @@ make debug ARG=path/to/map_file
 make clean
 ```
 
-**Lint:**
+**check mypy and flake8:**
 ```bash
 make lint
 ```
