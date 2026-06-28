@@ -18,6 +18,7 @@ class Simulation:
         all_paths: List[List[Zone]] = []
 
         zone_drones: Dict = {z.name: 0 for z in graph.zones}
+        original_types: Dict = {z.name: z.zone_type for z in graph.zones}
 
         for d in range(1, graph.nb_drones + 1):
             try:
@@ -27,12 +28,17 @@ class Simulation:
                 for zone in best_path:
                     if zone.hub_category not in ["start_hub", "end_hub"]:
                         zone_drones[zone.name] += 1
-
                         if zone_drones[zone.name] >= zone.max_drones:
-                            pass
+                            zone.zone_type = "blocked"
+
             except ValueError:
-                print(f"[ERROR]: No alternative path found for Drone {d}!")
-                exit()
+                for zone in graph.zones:
+                    zone.zone_type = original_types[zone.name]
+                best_path = Dijkstra.shortest_path(graph)
+                all_paths.append(best_path)
+
+        for zone in graph.zones:
+            zone.zone_type = original_types[zone.name]
 
         return all_paths
 
@@ -223,6 +229,7 @@ class Simulation:
         while not all(d.is_done for d in drones):
             turn_moves: List[Dict[str, Any]] = []
             zone_occupancy = Simulation._calculate_occupancy(graph, drones)
+
             road_usage: Dict[str, int] = {}
 
             for d in drones:
