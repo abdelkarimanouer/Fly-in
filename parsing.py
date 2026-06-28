@@ -37,6 +37,22 @@ class Parsing:
         if not meta_data:
             return default_data
         parts = ''.join(d + " " for d in meta_data)
+
+        if "[" not in parts or "]" not in parts:
+            print(f"[ERROR] line <{line_num}>:"
+                  f" meta data should be inside []")
+            exit()
+
+        for i in range(len(parts) - 1):
+            if parts[i] == '[' and parts[i+1] == '[':
+                print(f"[ERROR] line <{line_num}>:"
+                      f"Invalid metadata (stacked '[[' found)")
+                exit()
+            if parts[i] == ']' and parts[i+1] == ']':
+                print(f"[ERROR] line <{line_num}>:"
+                      f"Invalid metadata (stacked ']]' found)")
+                exit()
+
         parts = parts.strip("[] ")
         color_found: bool = False
         zonetype_found: bool = False
@@ -151,7 +167,24 @@ class Parsing:
                       f"connection: zone1-zone2")
                 exit()
             if len(data) > 2:
-                raw_meta = ' '.join(data[2:]).strip("[] ")
+                raw_meta = ' '.join(data[2:])
+
+                if "[" not in raw_meta or "]" not in raw_meta:
+                    print(f"[ERROR] line <{line_num}>:"
+                          f" meta data should be inside []")
+                    exit()
+
+                for i in range(len(raw_meta) - 1):
+                    if raw_meta[i] == '[' and raw_meta[i+1] == '[':
+                        print(f"[ERROR] line <{line_num}>:"
+                              f"Invalid metadata (stacked '[[' found)")
+                        exit()
+                    if raw_meta[i] == ']' and raw_meta[i+1] == ']':
+                        print(f"[ERROR] line <{line_num}>:"
+                              f"Invalid metadata (stacked ']]' found)")
+                        exit()
+
+                raw_meta = raw_meta.strip("[] ")
                 meta_parts = raw_meta.split()
                 for part in meta_parts:
                     if "=" not in part:
