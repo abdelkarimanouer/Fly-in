@@ -220,8 +220,6 @@ class Simulation:
     def start_simulation(graph: Graph, drones: List[Drone]) -> None:
         """Run the simulation turn by turn until all drones are done."""
 
-        total_turns: int = 0
-
         while not all(d.is_done for d in drones):
             turn_moves: List[Dict[str, Any]] = []
             zone_occupancy = Simulation._calculate_occupancy(graph, drones)
@@ -232,8 +230,4 @@ class Simulation:
                                           road_usage, turn_moves)
 
             if turn_moves:
-                total_turns += 1
                 Simulation._print_simulation(turn_moves)
-
-        print(f"\n[bold green]Simulation complete!"
-              f"Total Turns: {total_turns}[/]")

@@ -68,7 +68,7 @@ class Parsing:
                         exit()
                     zonetype_found = True
                     default_data["zone_type"] = value
-                elif data == "max_drones" and max_number_found is None:
+                elif data == "max_drones" and max_number_found is False:
                     try:
                         default_data["max_drones"] = int(value)
                         max_number_found = True
