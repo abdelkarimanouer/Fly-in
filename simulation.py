@@ -23,19 +23,19 @@ class Simulation:
         for d in range(1, graph.nb_drones + 1):
             try:
                 best_path = Dijkstra.shortest_path(graph)
+                if best_path in all_paths:
+                    break
                 all_paths.append(best_path)
 
                 for zone in best_path:
                     if zone.hub_category not in ["start_hub", "end_hub"]:
                         zone_drones[zone.name] += 1
                         if zone_drones[zone.name] >= zone.max_drones:
-                            zone.zone_type = "blocked"
+                            zone.zone_type = "restricted"
 
             except ValueError:
-                for zone in graph.zones:
-                    zone.zone_type = original_types[zone.name]
-                best_path = Dijkstra.shortest_path(graph)
-                all_paths.append(best_path)
+                print(f"[ERROR]: No path found for D{d}")
+                exit()
 
         for zone in graph.zones:
             zone.zone_type = original_types[zone.name]
